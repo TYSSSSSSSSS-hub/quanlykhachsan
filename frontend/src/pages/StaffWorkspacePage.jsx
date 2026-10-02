@@ -28,14 +28,14 @@ export const StaffWorkspacePage = () => {
 
   // Service Tasks State
   const [serviceTasks, setServiceTasks] = useState([
-    { id: 1, roomNumber: 'P102', serviceName: 'Set ăn tối tại phòng (Room Service)', quantity: 1, time: '16:15', status: 'Pending', guestName: 'Marcus Chen', note: 'Giao món lúc 18:30' },
-    { id: 2, roomNumber: 'P201', serviceName: 'Giặt ủi quần áo cao cấp', quantity: 2, time: '15:45', status: 'In-Progress', guestName: 'Elena Vance', note: 'Ủi phẳng bộ comple xanh' },
-    { id: 3, roomNumber: 'P301', serviceName: 'Nước ngọt & Minibar tủ lạnh', quantity: 4, time: '14:30', status: 'Completed', guestName: 'David Sterling', note: 'Đã giao 4 lon Nước ép' },
-    { id: 4, roomNumber: 'P101', serviceName: 'Bữa sáng buffet sang trọng', quantity: 2, time: '07:30', status: 'Completed', guestName: 'Phạm Văn Nam', note: 'Đã phục vụ tại bàn' },
+    { id: 1, roomNumber: 'Phòng P102', serviceName: 'Set ăn tối tại phòng (Room Service)', quantity: 1, time: '16:15', status: 'Pending', guestName: 'Marcus Chen', note: 'Giao món lúc 18:30' },
+    { id: 2, roomNumber: 'Phòng P201', serviceName: 'Giặt ủi quần áo cao cấp', quantity: 2, time: '15:45', status: 'In-Progress', guestName: 'Elena Vance', note: 'Ủi phẳng bộ comple xanh' },
+    { id: 3, roomNumber: 'Phòng P301', serviceName: 'Nước ngọt & Minibar tủ lạnh', quantity: 4, time: '14:30', status: 'Completed', guestName: 'David Sterling', note: 'Đã giao 4 lon Nước ép' }
   ]);
 
   useEffect(() => {
     loadRooms();
+    loadTasks();
   }, []);
 
   const loadRooms = async () => {
@@ -47,6 +47,38 @@ export const StaffWorkspacePage = () => {
       console.error('Lỗi khi tải danh sách phòng:', err);
     } finally {
       setLoadingRooms(false);
+    }
+  };
+
+  const loadTasks = async () => {
+    try {
+      const data = await api.getAllServiceOrders();
+      if (Array.isArray(data) && data.length > 0) {
+        const mapped = data.map(o => {
+          // Try to extract room number from multiple possible paths
+          const roomNum = o.booking?.room?.roomNumber
+            || o.roomNumber
+            || null;
+          const bookingStatus = (o.booking?.status || '').toUpperCase();
+          let taskStatus = 'Completed';
+          if (bookingStatus === 'CHECKED_IN') taskStatus = 'In-Progress';
+          else if (bookingStatus === 'BOOKED' || bookingStatus === 'CONFIRMED') taskStatus = 'Pending';
+
+          return {
+            id: o.id,
+            roomNumber: roomNum ? `Phòng ${roomNum}` : `Đơn #${o.booking?.id || o.id}`,
+            serviceName: o.service?.name || 'Dịch vụ phòng',
+            quantity: o.quantity || 1,
+            time: o.orderedAt ? new Date(o.orderedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Hôm nay',
+            status: taskStatus,
+            guestName: o.booking?.guest?.fullName || 'Khách lưu trú',
+            note: `Đơn giá: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(o.totalPrice || 0)}`
+          };
+        });
+        setServiceTasks(mapped);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải yêu cầu dịch vụ:', err);
     }
   };
 
@@ -125,7 +157,7 @@ export const StaffWorkspacePage = () => {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button
-            onClick={loadRooms}
+            onClick={() => { loadRooms(); loadTasks(); }}
             className="btn btn-outline"
             style={{ fontSize: '0.8125rem', padding: '0.5rem 0.875rem', backgroundColor: '#ffffff', borderColor: '#cbd5e1', color: '#334155', fontWeight: 600 }}
           >
@@ -265,7 +297,7 @@ export const StaffWorkspacePage = () => {
                       <div style={{ fontSize: '0.8125rem', color: '#64748b', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                         <div>Loại phòng: <strong style={{ color: '#0f172a' }}>{room.roomType?.name || 'Deluxe King'}</strong></div>
                         <div>Tầng: <strong style={{ color: '#0f172a' }}>{room.floor || 1}</strong></div>
-                        <div>Giá phòng: <strong style={{ color: '#16a34a' }}>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.price || 0)}</strong></div>
+                        <div>Giá phòng: <strong style={{ color: '#16a34a' }}>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.roomType?.basePrice || room.price || 0)}</strong></div>
                       </div>
                     </div>
 

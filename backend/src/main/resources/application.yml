@@ -11,21 +11,21 @@ spring:
     name: hotel-management
   
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:hotel_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/hotel_db?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&characterEncoding=UTF-8}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:com.mysql.cj.jdbc.Driver}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:S1a2n3g4@2006}
   
   h2:
     console:
-      enabled: true
-      path: /h2-console
+      enabled: false
 
   jpa:
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
     properties:
       hibernate:
         format_sql: true
@@ -39,5 +39,5 @@ spring:
       mode: never
 
 jwt:
-  secret: HotelManagementSecretKey98765432101234567890HotelManagementSecretKey
-  expiration-ms: 86400000 # 24 hours
+  secret: ${JWT_SECRET:HotelManagementSecretKey98765432101234567890HotelManagementSecretKey}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}

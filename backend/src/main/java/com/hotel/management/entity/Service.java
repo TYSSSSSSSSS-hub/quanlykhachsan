@@ -43,4 +43,10 @@ public class Service {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
+
+    public Boolean getIsActive() { return isActive != null ? isActive : true; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

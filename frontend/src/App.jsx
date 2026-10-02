@@ -76,13 +76,34 @@ const MainLayout = () => {
     setIsServiceModalOpen(true);
   };
 
-  const handleCheckout = (room) => {
-    if (typeof room === 'object') {
-      setSelectedBookingIdForInvoice(room.id);
-    } else {
-      setSelectedBookingIdForInvoice(room);
+  const handleCheckout = async (target) => {
+    let bookingId = null;
+    if (typeof target === 'number') {
+      bookingId = target;
+    } else if (target?.bookingCode) {
+      bookingId = target.id;
+    } else if (target?.roomNumber) {
+      try {
+        const bookings = await api.getBookings();
+        const active = bookings.find(b => b.room?.id === target.id && (b.status === 'CHECKED_IN' || b.status === 'Checked-in'));
+        if (active) {
+          bookingId = active.id;
+        } else {
+          alert(`Phòng ${target.roomNumber} hiện không có đơn lưu trú nào đang Check-in.`);
+          return;
+        }
+      } catch (err) {
+        alert('Lỗi tìm đơn đặt phòng: ' + err.message);
+        return;
+      }
+    } else if (target?.id) {
+      bookingId = target.id;
     }
-    setIsInvoiceModalOpen(true);
+
+    if (bookingId) {
+      setSelectedBookingIdForInvoice(bookingId);
+      setIsInvoiceModalOpen(true);
+    }
   };
 
   const handleTransferSuccess = (transferData) => {
@@ -144,10 +165,7 @@ const MainLayout = () => {
                 setInitialRoomForBooking(null);
                 setIsBookingModalOpen(true);
               }}
-              onCheckout={(room) => {
-                setSelectedBookingIdForInvoice(room.id || 1);
-                setIsInvoiceModalOpen(true);
-              }}
+              onCheckout={handleCheckout}
               onTransferRoom={(booking) => {
                 setSelectedBookingForTransfer(booking);
                 setSelectedRoomForTransfer(booking?.room);
@@ -161,10 +179,7 @@ const MainLayout = () => {
               refreshKey={refreshKey}
               onSelectRoom={handleSelectRoom}
               onOrderService={handleOrderService}
-              onCheckout={(room) => {
-                setSelectedBookingIdForInvoice(1);
-                setIsInvoiceModalOpen(true);
-              }}
+              onCheckout={handleCheckout}
             />
           )}
 

@@ -31,6 +31,15 @@ export const ReservationsPage = ({ onOpenBookingModal, onCheckout, onTransferRoo
     }
   };
 
+  const handleConfirm = async (id) => {
+    try {
+      await api.confirmBooking(id);
+      loadBookings();
+    } catch (err) {
+      alert('Lỗi xác nhận đặt phòng: ' + err.message);
+    }
+  };
+
   const filteredBookings = bookings.filter(b => {
     const matchesSearch = 
       (b.bookingCode || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -284,9 +293,14 @@ export const ReservationsPage = ({ onOpenBookingModal, onCheckout, onTransferRoo
                     </td>
                     <td style={{ padding: '0.875rem 1rem', textAlign: 'right' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '0.375rem' }}>
-                        {(b.status === 'BOOKED' || b.status === 'CONFIRMED' || b.status === 'Pending') && (
-                          <button onClick={() => handleCheckIn(b.id)} className="btn btn-success" style={{ backgroundColor: '#16a34a', borderColor: '#16a34a', color: '#fff', fontSize: '0.75rem', padding: '0.375rem 0.625rem', fontWeight: 700, borderRadius: '0.375rem' }}>
-                            <CheckCircle size={14} style={{ marginRight: '4px' }} /> Check-in
+                        {(b.status === 'PENDING' || b.status === 'Pending') && (
+                          <button onClick={() => handleConfirm(b.id)} className="btn btn-primary" style={{ backgroundColor: '#2563eb', borderColor: '#2563eb', color: '#fff', fontSize: '0.75rem', padding: '0.375rem 0.625rem', fontWeight: 700, borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <CheckCircle size={14} /> Xác nhận
+                          </button>
+                        )}
+                        {(b.status === 'BOOKED' || b.status === 'CONFIRMED') && (
+                          <button onClick={() => handleCheckIn(b.id)} className="btn btn-success" style={{ backgroundColor: '#16a34a', borderColor: '#16a34a', color: '#fff', fontSize: '0.75rem', padding: '0.375rem 0.625rem', fontWeight: 700, borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <CheckCircle size={14} /> Check-in
                           </button>
                         )}
                         {(b.status === 'CHECKED_IN' || b.status === 'Checked-in') && (
@@ -299,7 +313,7 @@ export const ReservationsPage = ({ onOpenBookingModal, onCheckout, onTransferRoo
                             >
                               <ArrowRightLeft size={13} /> Đổi Phòng
                             </button>
-                            <button onClick={() => onCheckout(b.room)} className="btn btn-danger" style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', color: '#fff', fontSize: '0.75rem', padding: '0.375rem 0.625rem', fontWeight: 700, borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <button onClick={() => onCheckout(b)} className="btn btn-danger" style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', color: '#fff', fontSize: '0.75rem', padding: '0.375rem 0.625rem', fontWeight: 700, borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                               <LogOut size={13} /> Trả Phòng
                             </button>
                           </>

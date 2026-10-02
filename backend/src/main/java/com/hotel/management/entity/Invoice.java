@@ -21,6 +21,9 @@ public class Invoice {
     private Double roomCharge;
     private Double serviceCharge;
     private Double taxAmount;
+    private Double damageCharge = 0.0;
+    private String damageDescription;
+    private Double depositAmount = 0.0;
     private Double totalAmount;
 
     @Column(nullable = false)
@@ -32,13 +35,16 @@ public class Invoice {
 
     public Invoice() {}
 
-    public Invoice(Long id, String invoiceNumber, Booking booking, Double roomCharge, Double serviceCharge, Double taxAmount, Double totalAmount, String status, String paymentMethod, LocalDateTime createdAt, String notes) {
+    public Invoice(Long id, String invoiceNumber, Booking booking, Double roomCharge, Double serviceCharge, Double taxAmount, Double damageCharge, String damageDescription, Double depositAmount, Double totalAmount, String status, String paymentMethod, LocalDateTime createdAt, String notes) {
         this.id = id;
         this.invoiceNumber = invoiceNumber;
         this.booking = booking;
         this.roomCharge = roomCharge;
         this.serviceCharge = serviceCharge;
         this.taxAmount = taxAmount;
+        this.damageCharge = damageCharge;
+        this.damageDescription = damageDescription;
+        this.depositAmount = depositAmount;
         this.totalAmount = totalAmount;
         this.status = status;
         this.paymentMethod = paymentMethod;
@@ -75,6 +81,15 @@ public class Invoice {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Double getDamageCharge() { return damageCharge; }
+    public void setDamageCharge(Double damageCharge) { this.damageCharge = damageCharge; }
+
+    public String getDamageDescription() { return damageDescription; }
+    public void setDamageDescription(String damageDescription) { this.damageDescription = damageDescription; }
+
+    public Double getDepositAmount() { return depositAmount; }
+    public void setDepositAmount(Double depositAmount) { this.depositAmount = depositAmount; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

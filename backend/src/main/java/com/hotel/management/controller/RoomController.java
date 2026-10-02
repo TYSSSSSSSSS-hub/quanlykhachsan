@@ -36,6 +36,17 @@ public class RoomController {
         return ResponseEntity.ok(roomService.updateRoomStatus(id, status));
     }
 
+    @PostMapping("/{id}/report-incident")
+    public ResponseEntity<Room> reportIncident(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String report = body.get("incidentReport");
+        return ResponseEntity.ok(roomService.reportIncident(id, report));
+    }
+
+    @PostMapping("/{id}/clear-incident")
+    public ResponseEntity<Room> clearIncident(@PathVariable Long id) {
+        return ResponseEntity.ok(roomService.clearIncident(id));
+    }
+
     @PostMapping
     public ResponseEntity<Room> createRoom(@RequestBody Room room) {
         return ResponseEntity.ok(roomService.saveRoom(room));
@@ -43,8 +54,7 @@ public class RoomController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Room> updateRoom(@PathVariable Long id, @RequestBody Room room) {
-        room.setId(id);
-        return ResponseEntity.ok(roomService.saveRoom(room));
+        return ResponseEntity.ok(roomService.updateRoom(id, room));
     }
 
     @DeleteMapping("/{id}")
@@ -61,5 +71,21 @@ public class RoomController {
     @PostMapping("/types")
     public ResponseEntity<RoomType> createRoomType(@RequestBody RoomType roomType) {
         return ResponseEntity.ok(roomService.saveRoomType(roomType));
+    }
+
+    @PutMapping("/types/{id}")
+    public ResponseEntity<RoomType> updateRoomType(@PathVariable Long id, @RequestBody RoomType roomType) {
+        return ResponseEntity.ok(roomService.updateRoomType(id, roomType));
+    }
+
+    @PatchMapping("/types/{id}/toggle-status")
+    public ResponseEntity<RoomType> toggleRoomTypeStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(roomService.toggleRoomTypeStatus(id));
+    }
+
+    @DeleteMapping("/types/{id}")
+    public ResponseEntity<?> deleteRoomType(@PathVariable Long id) {
+        roomService.deleteRoomType(id);
+        return ResponseEntity.ok().build();
     }
 }

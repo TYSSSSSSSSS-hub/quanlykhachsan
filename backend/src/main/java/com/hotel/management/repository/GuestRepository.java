@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface GuestRepository extends JpaRepository<Guest, Long> {
     Optional<Guest> findByPhone(String phone);
+    Optional<Guest> findByEmail(String email);
     Optional<Guest> findByIdCard(String idCard);
     List<Guest> findByFullNameContainingIgnoreCase(String name);
 }

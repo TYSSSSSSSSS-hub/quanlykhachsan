@@ -49,4 +49,10 @@ public class RoomType {
 
     public String getAmenities() { return amenities; }
     public void setAmenities(String amenities) { this.amenities = amenities; }
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
+
+    public Boolean getIsActive() { return isActive != null ? isActive : true; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

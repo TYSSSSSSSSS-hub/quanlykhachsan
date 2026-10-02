@@ -29,11 +29,14 @@ public class InvoiceService {
     }
 
     public Invoice getInvoiceByBookingId(Long bookingId) {
-        return invoiceRepository.findByBookingId(bookingId)
-                .orElseGet(() -> generateInvoiceForBooking(bookingId));
+        return generateInvoiceForBooking(bookingId);
     }
 
     public Invoice generateInvoiceForBooking(Long bookingId) {
+        return generateInvoiceForBookingWithDetails(bookingId, 0.0, null, "CASH", 0.0);
+    }
+
+    public Invoice generateInvoiceForBookingWithDetails(Long bookingId, Double damageCharge, String damageDescription, String paymentMethod, Double depositAmount) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng: " + bookingId));
 
@@ -41,22 +44,31 @@ public class InvoiceService {
 
         List<BookingService> services = bookingServiceRepository.findByBookingId(bookingId);
         double serviceCharge = services.stream().mapToDouble(BookingService::getTotalPrice).sum();
+        double damage = damageCharge != null ? damageCharge : 0.0;
 
-        double subtotal = roomCharge + serviceCharge;
+        double subtotal = roomCharge + serviceCharge + damage;
         double taxAmount = subtotal * 0.1; // 10% VAT
         double grandTotal = subtotal + taxAmount;
+        double deposit = depositAmount != null && depositAmount > 0 
+                ? depositAmount 
+                : (booking.getDepositAmount() != null ? booking.getDepositAmount() : 0.0);
 
-        Invoice invoice = new Invoice();
-        invoice.setInvoiceNumber("INV-" + System.currentTimeMillis() % 1000000);
+        Invoice invoice = invoiceRepository.findByBookingId(bookingId).orElseGet(Invoice::new);
+        if (invoice.getInvoiceNumber() == null) {
+            invoice.setInvoiceNumber("INV-" + System.currentTimeMillis() % 1000000);
+        }
         invoice.setBooking(booking);
         invoice.setRoomCharge(roomCharge);
         invoice.setServiceCharge(serviceCharge);
+        invoice.setDamageCharge(damage);
+        invoice.setDamageDescription(damageDescription);
+        invoice.setDepositAmount(deposit);
         invoice.setTaxAmount(taxAmount);
         invoice.setTotalAmount(grandTotal);
         invoice.setStatus("PAID");
-        invoice.setPaymentMethod("CASH");
+        invoice.setPaymentMethod(paymentMethod != null ? paymentMethod : "CASH");
         invoice.setCreatedAt(LocalDateTime.now());
-        invoice.setNotes("Hóa đơn đã thanh toán đầy đủ");
+        invoice.setNotes("Hóa đơn đã thanh toán đầy đủ" + (damage > 0 ? " (bao gồm phí đền bù hư hỏng tài sản)" : ""));
 
         return invoiceRepository.save(invoice);
     }

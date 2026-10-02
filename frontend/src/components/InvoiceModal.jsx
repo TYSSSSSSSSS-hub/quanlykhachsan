@@ -33,7 +33,7 @@ export const InvoiceModal = ({ isOpen, onClose, bookingId, onCheckoutSuccess }) 
   const handleConfirmCheckout = async () => {
     try {
       await api.checkOut(bookingId);
-      alert('Trả phòng và hoàn tất hóa đơn thành công!');
+      alert('✓ Trả phòng thành công! Phòng đã chuyển sang trạng thái Cần dọn dẹp (CLEANING) để buồng phòng dọn dẹp trước khi đón khách mới.');
       if (onCheckoutSuccess) onCheckoutSuccess();
       onClose();
     } catch (err) {

@@ -29,7 +29,27 @@ public class InvoiceController {
     }
 
     @PostMapping("/generate/{bookingId}")
-    public ResponseEntity<Invoice> generateInvoice(@PathVariable Long bookingId) {
-        return ResponseEntity.ok(invoiceService.generateInvoiceForBooking(bookingId));
+    public ResponseEntity<Invoice> generateInvoice(@PathVariable Long bookingId, @RequestBody(required = false) java.util.Map<String, Object> body) {
+        Double damageCharge = 0.0;
+        String damageDescription = null;
+        String paymentMethod = "CASH";
+        Double depositAmount = 0.0;
+
+        if (body != null) {
+            if (body.containsKey("damageCharge") && body.get("damageCharge") instanceof Number) {
+                damageCharge = ((Number) body.get("damageCharge")).doubleValue();
+            }
+            if (body.containsKey("damageDescription")) {
+                damageDescription = (String) body.get("damageDescription");
+            }
+            if (body.containsKey("paymentMethod") && body.get("paymentMethod") != null) {
+                paymentMethod = (String) body.get("paymentMethod");
+            }
+            if (body.containsKey("depositAmount") && body.get("depositAmount") instanceof Number) {
+                depositAmount = ((Number) body.get("depositAmount")).doubleValue();
+            }
+        }
+
+        return ResponseEntity.ok(invoiceService.generateInvoiceForBookingWithDetails(bookingId, damageCharge, damageDescription, paymentMethod, depositAmount));
     }
 }

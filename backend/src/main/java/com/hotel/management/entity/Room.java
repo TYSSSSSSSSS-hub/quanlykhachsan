@@ -22,6 +22,8 @@ public class Room {
     @Column(nullable = false)
     private String status; // AVAILABLE, OCCUPIED, RESERVED, CLEANING, MAINTENANCE
 
+    private String incidentReport;
+
     public Room() {}
 
     public Room(Long id, String roomNumber, RoomType roomType, Integer floor, String status) {
@@ -46,4 +48,7 @@ public class Room {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getIncidentReport() { return incidentReport; }
+    public void setIncidentReport(String incidentReport) { this.incidentReport = incidentReport; }
 }

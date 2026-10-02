@@ -88,7 +88,86 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify(roomData)
     });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Thêm phòng thất bại');
+    }
     return res.json();
+  },
+
+  updateRoom: async (roomId, roomData) => {
+    const res = await fetch(`${API_BASE_URL}/rooms/${roomId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(roomData)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Cập nhật phòng thất bại');
+    }
+    return res.json();
+  },
+
+  deleteRoom: async (roomId) => {
+    const res = await fetch(`${API_BASE_URL}/rooms/${roomId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Xóa phòng thất bại');
+    }
+    return true;
+  },
+
+  createRoomType: async (typeData) => {
+    const res = await fetch(`${API_BASE_URL}/rooms/types`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(typeData)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Thêm loại phòng thất bại');
+    }
+    return res.json();
+  },
+
+  updateRoomType: async (typeId, typeData) => {
+    const res = await fetch(`${API_BASE_URL}/rooms/types/${typeId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(typeData)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Cập nhật loại phòng & giá thất bại');
+    }
+    return res.json();
+  },
+
+  toggleRoomTypeStatus: async (typeId) => {
+    const res = await fetch(`${API_BASE_URL}/rooms/types/${typeId}/toggle-status`, {
+      method: 'PATCH',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Đổi trạng thái loại phòng thất bại');
+    }
+    return res.json();
+  },
+
+  deleteRoomType: async (typeId) => {
+    const res = await fetch(`${API_BASE_URL}/rooms/types/${typeId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Xóa loại phòng thất bại');
+    }
+    return true;
   },
 
   // Bookings / Reservations
@@ -103,6 +182,23 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify(bookingData)
     });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Đặt phòng thất bại');
+    }
+    return res.json();
+  },
+
+  cancelBooking: async (bookingId, reason = 'Khách yêu cầu hủy đơn') => {
+    const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ reason, refundAmount: 0 })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Hủy đơn đặt phòng thất bại');
+    }
     return res.json();
   },
 
@@ -112,6 +208,24 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify(bookingData)
     });
+    if (!res.ok) {
+      let errMsg = 'Nhận phòng walk-in thất bại';
+      try { const j = await res.json(); errMsg = j.message || errMsg; } catch (_) { try { errMsg = await res.text(); } catch (_) {} }
+      throw new Error(errMsg);
+    }
+    return res.json();
+  },
+
+  confirmBooking: async (bookingId) => {
+    const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}/confirm`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      let errMsg = 'Xác nhận đặt phòng thất bại';
+      try { const j = await res.json(); errMsg = j.message || errMsg; } catch (_) { try { errMsg = await res.text(); } catch (_) {} }
+      throw new Error(errMsg);
+    }
     return res.json();
   },
 
@@ -120,6 +234,11 @@ export const api = {
       method: 'POST',
       headers: getHeaders()
     });
+    if (!res.ok) {
+      let errMsg = 'Check-in thất bại';
+      try { const j = await res.json(); errMsg = j.message || errMsg; } catch (_) { try { errMsg = await res.text(); } catch (_) {} }
+      throw new Error(errMsg);
+    }
     return res.json();
   },
 
@@ -128,6 +247,11 @@ export const api = {
       method: 'POST',
       headers: getHeaders()
     });
+    if (!res.ok) {
+      let errMsg = 'Check-out thất bại';
+      try { const j = await res.json(); errMsg = j.message || errMsg; } catch (_) { try { errMsg = await res.text(); } catch (_) {} }
+      throw new Error(errMsg);
+    }
     return res.json();
   },
 
@@ -171,7 +295,48 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify(serviceData)
     });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Thêm dịch vụ thất bại');
+    }
     return res.json();
+  },
+
+  updateService: async (serviceId, serviceData) => {
+    const res = await fetch(`${API_BASE_URL}/services/${serviceId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(serviceData)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Cập nhật dịch vụ thất bại');
+    }
+    return res.json();
+  },
+
+  toggleServiceStatus: async (serviceId) => {
+    const res = await fetch(`${API_BASE_URL}/services/${serviceId}/toggle-status`, {
+      method: 'PATCH',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Đổi trạng thái dịch vụ thất bại');
+    }
+    return res.json();
+  },
+
+  deleteService: async (serviceId) => {
+    const res = await fetch(`${API_BASE_URL}/services/${serviceId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Xóa dịch vụ thất bại');
+    }
+    return true;
   },
 
   orderService: async (orderData) => {
@@ -180,11 +345,36 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify(orderData)
     });
+    if (!res.ok) {
+      let errMsg = 'Đặt dịch vụ thất bại';
+      try {
+        const errJson = await res.json();
+        errMsg = errJson.message || errMsg;
+      } catch (_) {
+        const text = await res.text();
+        if (text) errMsg = text;
+      }
+      throw new Error(errMsg);
+    }
+    return res.json();
+  },
+
+  getMyBookings: async (phone, email) => {
+    const params = new URLSearchParams();
+    if (phone) params.append('phone', phone);
+    if (email) params.append('email', email);
+    const res = await fetch(`${API_BASE_URL}/bookings/my?${params.toString()}`, { headers: getHeaders() });
+    if (!res.ok) return [];
     return res.json();
   },
 
   getBookingServices: async (bookingId) => {
     const res = await fetch(`${API_BASE_URL}/services/booking/${bookingId}`, { headers: getHeaders() });
+    return res.json();
+  },
+
+  getAllServiceOrders: async () => {
+    const res = await fetch(`${API_BASE_URL}/services/orders`, { headers: getHeaders() });
     return res.json();
   },
 

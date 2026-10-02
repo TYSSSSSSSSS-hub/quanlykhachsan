@@ -12,9 +12,14 @@ public class BookingRequest {
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;
     private Integer numGuests;
+    private Double depositAmount = 0.0;
     private String notes;
+    private String status;
 
     public BookingRequest() {}
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public Long getRoomId() { return roomId; }
     public void setRoomId(Long roomId) { this.roomId = roomId; }
@@ -42,6 +47,9 @@ public class BookingRequest {
 
     public Integer getNumGuests() { return numGuests; }
     public void setNumGuests(Integer numGuests) { this.numGuests = numGuests; }
+
+    public Double getDepositAmount() { return depositAmount; }
+    public void setDepositAmount(Double depositAmount) { this.depositAmount = depositAmount; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

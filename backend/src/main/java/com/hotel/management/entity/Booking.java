@@ -26,15 +26,16 @@ public class Booking {
     private LocalDateTime checkOutDate;
 
     @Column(nullable = false)
-    private String status; // BOOKED, CHECKED_IN, CHECKED_OUT, CANCELLED
+    private String status; // BOOKED, CHECKED_IN, CHECKED_OUT, CANCELLED, NO_SHOW, PENDING, CONFIRMED
 
     private Double totalAmount;
+    private Double depositAmount = 0.0;
     private Integer numGuests;
     private String notes;
 
     public Booking() {}
 
-    public Booking(Long id, String bookingCode, Guest guest, Room room, LocalDateTime checkInDate, LocalDateTime checkOutDate, String status, Double totalAmount, Integer numGuests, String notes) {
+    public Booking(Long id, String bookingCode, Guest guest, Room room, LocalDateTime checkInDate, LocalDateTime checkOutDate, String status, Double totalAmount, Double depositAmount, Integer numGuests, String notes) {
         this.id = id;
         this.bookingCode = bookingCode;
         this.guest = guest;
@@ -43,6 +44,7 @@ public class Booking {
         this.checkOutDate = checkOutDate;
         this.status = status;
         this.totalAmount = totalAmount;
+        this.depositAmount = depositAmount;
         this.numGuests = numGuests;
         this.notes = notes;
     }
@@ -73,6 +75,9 @@ public class Booking {
 
     public Integer getNumGuests() { return numGuests; }
     public void setNumGuests(Integer numGuests) { this.numGuests = numGuests; }
+
+    public Double getDepositAmount() { return depositAmount; }
+    public void setDepositAmount(Double depositAmount) { this.depositAmount = depositAmount; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

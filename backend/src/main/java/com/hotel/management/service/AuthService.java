@@ -38,7 +38,7 @@ public class AuthService {
         }
 
         String token = jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
-        return new AuthResponse(token, user.getUsername(), user.getFullName(), user.getRole());
+        return new AuthResponse(token, user.getUsername(), user.getFullName(), user.getRole(), user.getPhone(), user.getEmail());
     }
 
     public AuthResponse registerCustomer(com.hotel.management.dto.RegisterRequest request) {
@@ -57,7 +57,7 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
-        return new AuthResponse(token, user.getUsername(), user.getFullName(), user.getRole());
+        return new AuthResponse(token, user.getUsername(), user.getFullName(), user.getRole(), user.getPhone(), user.getEmail());
     }
 
     public User getUserByUsername(String username) {

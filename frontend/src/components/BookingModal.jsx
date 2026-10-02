@@ -6,6 +6,7 @@ export const BookingModal = ({ isOpen, onClose, initialRoom, onSuccess }) => {
   const [rooms, setRooms] = useState([]);
   const [selectedRoomId, setSelectedRoomId] = useState('');
   const [isWalkIn, setIsWalkIn] = useState(true);
+  const [formError, setFormError] = useState('');
   
   const [formData, setFormData] = useState({
     guestName: '',
@@ -54,9 +55,62 @@ export const BookingModal = ({ isOpen, onClose, initialRoom, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
+
+    // --- Client-side validation ---
+    if (!selectedRoomId) {
+      setFormError('❌ Vui lòng chọn phòng.');
+      return;
+    }
+    if (!formData.guestName.trim() || formData.guestName.trim().length < 2) {
+      setFormError('❌ Họ và tên khách phải có ít nhất 2 ký tự.');
+      return;
+    }
+    const phoneRegex = /^[0-9+]{9,15}$/;
+    if (!formData.guestPhone.trim() || !phoneRegex.test(formData.guestPhone.trim())) {
+      setFormError('❌ Số điện thoại không hợp lệ (9–15 chữ số, có thể bắt đầu bằng +).');
+      return;
+    }
+    if (formData.guestEmail && formData.guestEmail.trim() && !/^[A-Za-z0-9+_.-]+@(.+)$/.test(formData.guestEmail.trim())) {
+      setFormError('❌ Địa chỉ email không đúng định dạng.');
+      return;
+    }
+
+    const checkIn = new Date(formData.checkInDate);
+    const checkOut = new Date(formData.checkOutDate);
+    if (!formData.checkInDate || !formData.checkOutDate) {
+      setFormError('❌ Vui lòng nhập đầy đủ ngày nhận phòng và trả phòng.');
+      return;
+    }
+    if (checkOut <= checkIn) {
+      setFormError('❌ Thời gian trả phòng phải sau thời gian nhận phòng.');
+      return;
+    }
+
+    const numGuests = Number(formData.numGuests);
+    if (numGuests < 1) {
+      setFormError('❌ Số lượng khách phải ít nhất là 1.');
+      return;
+    }
+    const selectedRoom = rooms.find(r => r.id === Number(selectedRoomId));
+    const cap = selectedRoom?.roomType?.capacity;
+    if (cap && numGuests > cap) {
+      setFormError(`❌ Số khách (${numGuests}) vượt sức chứa tối đa của phòng này (${cap} người).`);
+      return;
+    }
+
     try {
+      const checkInFormatted = formData.checkInDate && formData.checkInDate.length === 16
+        ? `${formData.checkInDate}:00`
+        : formData.checkInDate;
+      const checkOutFormatted = formData.checkOutDate && formData.checkOutDate.length === 16
+        ? `${formData.checkOutDate}:00`
+        : formData.checkOutDate;
+
       const payload = {
         ...formData,
+        checkInDate: checkInFormatted,
+        checkOutDate: checkOutFormatted,
         roomId: Number(selectedRoomId)
       };
 
@@ -68,7 +122,9 @@ export const BookingModal = ({ isOpen, onClose, initialRoom, onSuccess }) => {
       onSuccess();
       onClose();
     } catch (err) {
-      alert('Lỗi tạo đơn đặt phòng: ' + err.message);
+      let msg = err.message || 'Lỗi tạo đơn đặt phòng.';
+      try { const p = JSON.parse(msg); msg = p.message || msg; } catch (_) {}
+      setFormError('❌ ' + msg);
     }
   };
 
@@ -131,7 +187,22 @@ export const BookingModal = ({ isOpen, onClose, initialRoom, onSuccess }) => {
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Validation Error Banner */}
+          {formError && (
+            <div style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem',
+              fontSize: '0.875rem',
+              color: '#ef4444',
+              fontWeight: 600
+            }}>
+              {formError}
+            </div>
+          )}
           {/* Room Selection */}
+
           <div>
             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-gold)' }}>
               Chọn Phòng Khách Sạn

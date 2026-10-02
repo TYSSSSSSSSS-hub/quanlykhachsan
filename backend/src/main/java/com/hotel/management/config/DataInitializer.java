@@ -73,9 +73,10 @@ public class DataInitializer implements CommandLineRunner {
         Guest g3 = guestRepository.save(new Guest(null, "David Sterling", "+12025550192", "PASSPORT-US9988", "david.sterling@email.com", "Nam"));
 
         // 6. Bookings
-        Booking b1 = bookingRepository.save(new Booking(null, "BK-20260915-102", g1, r102, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "CHECKED_IN", 900000.0, 2, "Khách cần thêm gối"));
-        Booking b2 = bookingRepository.save(new Booking(null, "BK-20260915-201", g2, r201, LocalDateTime.now(), LocalDateTime.now().plusDays(3), "CHECKED_IN", 1950000.0, 3, "Yêu cầu phòng tầng cao"));
-        Booking b3 = bookingRepository.save(new Booking(null, "BK-20260915-301", g3, r301, LocalDateTime.now().minusDays(2), LocalDateTime.now(), "CHECKED_IN", 5000000.0, 2, "Khách VIP quốc tế"));
+        // Constructor: (id, bookingCode, guest, room, checkIn, checkOut, status, totalAmount, depositAmount, numGuests, notes)
+        Booking b1 = bookingRepository.save(new Booking(null, "BK-20260915-102", g1, r102, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "CHECKED_IN", 900000.0, 0.0, 2, "Khách cần thêm gối"));
+        Booking b2 = bookingRepository.save(new Booking(null, "BK-20260915-201", g2, r201, LocalDateTime.now(), LocalDateTime.now().plusDays(3), "CHECKED_IN", 1950000.0, 0.0, 3, "Yêu cầu phòng tầng cao"));
+        Booking b3 = bookingRepository.save(new Booking(null, "BK-20260915-301", g3, r301, LocalDateTime.now().minusDays(2), LocalDateTime.now(), "CHECKED_IN", 5000000.0, 500000.0, 2, "Khách VIP quốc tế"));
 
         // 7. Booking Services
         bookingServiceRepository.save(new BookingService(null, b1, s1, 4, 80000.0, LocalDateTime.now()));
@@ -83,6 +84,7 @@ public class DataInitializer implements CommandLineRunner {
         bookingServiceRepository.save(new BookingService(null, b2, s5, 1, 350000.0, LocalDateTime.now()));
 
         // 8. Invoices
-        invoiceRepository.save(new Invoice(null, "INV-20260915-001", b1, 900000.0, 150000.0, 105000.0, 1155000.0, "PAID", "CASH", LocalDateTime.now(), "Thanh toán tiền mặt tại lễ tân"));
+        // Constructor: (id, invoiceNumber, booking, roomCharge, serviceCharge, taxAmount, damageCharge, damageDescription, depositAmount, totalAmount, status, paymentMethod, createdAt, notes)
+        invoiceRepository.save(new Invoice(null, "INV-20260915-001", b1, 900000.0, 150000.0, 105000.0, 0.0, null, 0.0, 1155000.0, "PAID", "CASH", LocalDateTime.now(), "Thanh toán tiền mặt tại lễ tân"));
     }
 }
